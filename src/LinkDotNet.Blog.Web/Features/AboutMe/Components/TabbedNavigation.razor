@@ -12,10 +12,10 @@
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-skills-tab" tabindex="0">
-            <SkillTable ShowAdminActions="@IsAuthenticated"></SkillTable>
+            <SkillTable ShowAdminActions="@IsAuthenticated" ProfileId="@ProfileId"></SkillTable>
         </div>
         <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-talks-tab" tabindex="0">
-            <Talks ShowAdminActions="@IsAuthenticated"></Talks>
+            <Talks ShowAdminActions="@IsAuthenticated" ProfileId="@ProfileId"></Talks>
         </div>
     </div>
 </div>
@@ -23,4 +23,7 @@
 @code {
     [Parameter]
     public bool IsAuthenticated { get; set; }
+
+    [Parameter]
+    public string ProfileId { get; set; } = string.Empty;
 }

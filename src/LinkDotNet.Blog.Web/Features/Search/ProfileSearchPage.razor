@@ -1,0 +1,48 @@
+@page "/profile-information-search"
+@using LinkDotNet.Blog.Domain
+@using LinkDotNet.Blog.Infrastructure.Persistence
+@using LinkDotNet.Blog.Web.Features.Services
+@inject NavigationManager NavigationManager
+@inject IRepository<PersonalProfile> ProfileRepository
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-4">
+            <h3>Search Profiles</h3>
+            <input @bind="searchTerm" placeholder="Enter first or last name" class="form-control" />
+            <button @onclick="Search" class="btn btn-primary mt-2">Search</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-9 col-md-8">
+            @if (searchResults != null)
+            {
+                <ul class="list-group mt-3">
+                    @foreach (var result in searchResults)
+                    {
+                        <li class="list-group-item">
+                            <a @onclick="() => NavigateToProfile(result.Id)">@result.FullName</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string searchTerm;
+    private List<PersonalProfile> searchResults;
+
+    private async Task Search()
+    {
+        searchResults = (await ProfileRepository.GetAllAsync())
+            .Where(p => p.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || p.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private void NavigateToProfile(string profileId)
+    {
+        NavigationManager.NavigateTo($"/AboutMe/{profileId}");
+    }
+}

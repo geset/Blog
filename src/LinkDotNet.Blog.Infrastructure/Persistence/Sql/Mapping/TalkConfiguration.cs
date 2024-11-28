@@ -15,5 +15,10 @@ internal sealed class TalkConfiguration : IEntityTypeConfiguration<Talk>
         builder.Property(t => t.PresentationTitle).HasMaxLength(256).IsRequired();
         builder.Property(t => t.Place).HasMaxLength(256).IsRequired();
         builder.Property(t => t.PublishedDate).IsRequired();
+
+        builder.HasOne(e => e.Profile)
+              .WithOne(p => p.Talk)
+              .HasForeignKey<Talk>(e => e.ProfileId)
+              .OnDelete(DeleteBehavior.Cascade);
     }
 }

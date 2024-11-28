@@ -1,14 +1,16 @@
-﻿using System;
+using System;
 using LinkDotNet.Blog.Domain;
 
 namespace LinkDotNet.Blog.UnitTests.Domain;
 
 public class SkillTests
 {
+    private const string DefaultProfileId = "defaultProfileId";
+
     [Fact]
     public void ShouldCreateSkillTrimmedWhitespaces()
     {
-        var skill = Skill.Create(" C# ", "url", " Backend ", ProficiencyLevel.Expert.Key);
+        var skill = Skill.Create(" C# ", "url", " Backend ", ProficiencyLevel.Expert.Key, DefaultProfileId);
 
         skill.Name.ShouldBe("C#");
         skill.IconUrl.ShouldBe("url");
@@ -22,7 +24,7 @@ public class SkillTests
     [InlineData(" ")]
     public void ShouldThrowWhenWhitespaceName(string? name)
     {
-        Action result = () => Skill.Create(name!, "url", "backend", ProficiencyLevel.Expert.Key);
+        Action result = () => Skill.Create(name!, "url", "backend", ProficiencyLevel.Expert.Key, DefaultProfileId);
 
         result.ShouldThrow<ArgumentException>();
     }
@@ -33,7 +35,7 @@ public class SkillTests
     [InlineData(" ")]
     public void ShouldThrowWhenWhitespaceCapability(string? capability)
     {
-        Action result = () => Skill.Create("name", "url", capability!, ProficiencyLevel.Expert.Key);
+        Action result = () => Skill.Create("name", "url", capability!, ProficiencyLevel.Expert.Key, DefaultProfileId);
 
         result.ShouldThrow<ArgumentException>();
     }
@@ -41,7 +43,7 @@ public class SkillTests
     [Fact]
     public void ShouldThrowWhenInvalidProficiencyLevel()
     {
-        Action result = () => Skill.Create("name", "url", "cap", "null");
+        Action result = () => Skill.Create("name", "url", "cap", "null", DefaultProfileId);
         result.ShouldThrow<Exception>();
     }
 
@@ -51,7 +53,7 @@ public class SkillTests
     [InlineData(" ")]
     public void ShouldSetUrlToNullWhenWhitespace(string? url)
     {
-        var skill = Skill.Create("name", url, "cap", ProficiencyLevel.Expert.Key);
+        var skill = Skill.Create("name", url, "cap", ProficiencyLevel.Expert.Key, DefaultProfileId);
 
         skill.IconUrl.ShouldBeNull();
     }
@@ -59,7 +61,7 @@ public class SkillTests
     [Fact]
     public void ShouldSetProficiencyLevel()
     {
-        var skill = Skill.Create("name", null, "cap", ProficiencyLevel.Familiar.Key);
+        var skill = Skill.Create("name", null, "cap", ProficiencyLevel.Familiar.Key, DefaultProfileId);
 
         skill.SetProficiencyLevel(ProficiencyLevel.Proficient);
 
@@ -69,7 +71,7 @@ public class SkillTests
     [Fact]
     public void ShouldThrowWhenProficiencyIsNull()
     {
-        var skill = Skill.Create("name", null, "cap", ProficiencyLevel.Familiar.Key);
+        var skill = Skill.Create("name", null, "cap", ProficiencyLevel.Familiar.Key, DefaultProfileId);
 
         Action result = () => skill.SetProficiencyLevel(null!);
 

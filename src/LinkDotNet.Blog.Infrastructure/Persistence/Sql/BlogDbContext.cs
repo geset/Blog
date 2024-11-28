@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using LinkDotNet.Blog.Domain;
 using LinkDotNet.Blog.Infrastructure.Persistence.Sql.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +28,7 @@ public sealed class BlogDbContext : DbContext
     public DbSet<SimilarBlogPost> SimilarBlogPosts { get; set; }
 
     public DbSet<ShortCode> ShortCodes { get; set; }
+    public DbSet<PersonalProfile> PersonalProfiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,5 +42,6 @@ public sealed class BlogDbContext : DbContext
         modelBuilder.ApplyConfiguration(new SkillConfiguration());
         modelBuilder.ApplyConfiguration(new TalkConfiguration());
         modelBuilder.ApplyConfiguration(new UserRecordConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonalProfileConfiguration());
     }
 }

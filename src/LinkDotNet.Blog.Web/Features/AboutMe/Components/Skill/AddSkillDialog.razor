@@ -1,4 +1,4 @@
-﻿@using LinkDotNet.Blog.Domain
+@using LinkDotNet.Blog.Domain
 @inject IToastService ToastService
 <ModalDialog @ref="Dialog" Title="Add Skill">
     <EditForm Model="@model" OnValidSubmit="CreateSkillItem">
@@ -35,6 +35,9 @@
     [Parameter]
     public EventCallback<Skill> SkillAdded { get; set; }
 
+    [Parameter]
+    public string ProfileId { get; set; } = default!;
+
     private AddSkillModel model = new();
     private ModalDialog Dialog { get; set; } = default!;
 
@@ -46,10 +49,10 @@
 
     private async Task CreateSkillItem()
     {
-	    ArgumentNullException.ThrowIfNull(model.Skill);
-	    ArgumentNullException.ThrowIfNull(model.Capability);
+        ArgumentNullException.ThrowIfNull(model.Skill);
+        ArgumentNullException.ThrowIfNull(model.Capability);
 
-        var skill = Skill.Create(model.Skill, model.ImageUrl, model.Capability, model.Proficiency);
+        var skill = Skill.Create(model.Skill, model.ImageUrl, model.Capability, model.Proficiency, ProfileId);
         await SkillAdded.InvokeAsync(skill);
         model = new AddSkillModel();
         ToastService.ShowSuccess($"Created Skill {skill.Name} in capability {skill.Capability} with level {skill.ProficiencyLevel}");

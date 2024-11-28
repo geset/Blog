@@ -1,14 +1,14 @@
-﻿@using LinkDotNet.Blog.Domain
+@using LinkDotNet.Blog.Domain
 @using LinkDotNet.Blog.Infrastructure.Persistence
 @inject IRepository<Skill> Repository
 <div>
-        @if (ShowAdminActions)
-        {
-            <button type="button" class="btn btn-primary" @onclick="() => AddSkillDialog.Open()">
-                <i class="plus"></i>Add skill</button>
-            <AddSkillDialog @ref="AddSkillDialog" SkillAdded="@AddSkill"></AddSkillDialog>
-        }
-    </div>
+    @if (ShowAdminActions)
+    {
+        <button type="button" class="btn btn-primary" @onclick="() => AddSkillDialog.Open()">
+            <i class="plus"></i>Add skill</button>
+        <AddSkillDialog @ref="AddSkillDialog" SkillAdded="@AddSkill" ProfileId="@ProfileId" />
+    }
+</div>
 <div class="table-container">
     <table class="skill-table" id="skill-table">
         <tbody>
@@ -58,15 +58,20 @@
     [Parameter]
     public bool ShowAdminActions { get; set; }
 
+    [Parameter]
+    public string ProfileId { get; set; } = string.Empty;
+
     private AddSkillDialog AddSkillDialog { get; set; } = default!;
 
-    private List<Skill> skills = [];
+    private List<Skill> skills = new();
 
     private Skill? currentDragItem;
 
     protected override async Task OnInitializedAsync()
     {
-        skills = (await Repository.GetAllAsync()).ToList();
+        skills = (await Repository.GetAllAsync())
+            .Where(s => s.ProfileId == ProfileId)
+            .ToList();
     }
 
     private async Task AddSkill(Skill skillToAdd)
@@ -92,5 +97,4 @@
         await Repository.StoreAsync(currentDragItem);
         currentDragItem = null;
     }
-
 }

@@ -5,10 +5,12 @@ namespace LinkDotNet.Blog.UnitTests.Domain;
 
 public class TalkTests
 {
+    private const string DefaultProfileId = "defaultProfileId";
+
     [Fact]
     public void CreateTalkWithTrimmedWhiteSpaces()
     {
-        var talk = Talk.Create(" title ", " place ", " desc ", new DateTime(2022, 10, 2));
+        var talk = Talk.Create(" title ", " place ", " desc ", new DateTime(2022, 10, 2), DefaultProfileId);
 
         talk.PresentationTitle.ShouldBe("title");
         talk.Place.ShouldBe("place");
@@ -28,7 +30,7 @@ public class TalkTests
     [InlineData("title", "place", " ")]
     public void TalkWithInvalidInvariantShouldNotBeCreated(string? title, string? place, string? desc)
     {
-        Action act = () => Talk.Create(title!, place!, desc!, DateTime.MinValue);
+        Action act = () => Talk.Create(title!, place!, desc!, DateTime.MinValue, DefaultProfileId);
 
         act.ShouldThrow<Exception>();
     }
