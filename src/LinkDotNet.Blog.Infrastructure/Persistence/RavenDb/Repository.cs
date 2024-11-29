@@ -39,6 +39,19 @@ public sealed class Repository<TEntity> : IRepository<TEntity>
         return await session.LoadAsync<TEntity>(id);
     }
 
+    public async ValueTask<TEntity?> GetByIdWithIncludeAsync(string id, params Expression<Func<TEntity, object>>[] includes)
+    {
+        using var session = documentStore.OpenAsyncSession();
+        var query = session.Query<TEntity>();
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
+
     public ValueTask<IPagedList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? filter = null,
         Expression<Func<TEntity, object>>? orderBy = null,
         bool descending = true,
@@ -117,4 +130,5 @@ public sealed class Repository<TEntity> : IRepository<TEntity>
 
         await session.SaveChangesAsync();
     }
+
 }

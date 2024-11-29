@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -13,6 +13,7 @@ public interface IRepository<TEntity>
     ValueTask<HealthCheckResult> PerformHealthCheckAsync();
 
     ValueTask<TEntity?> GetByIdAsync(string id);
+    ValueTask<TEntity?> GetByIdWithIncludeAsync(string id, params Expression<Func<TEntity, object>>[] includes);
 
     ValueTask<IPagedList<TEntity>> GetAllAsync(
         Expression<Func<TEntity, bool>>? filter = null,

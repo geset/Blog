@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -28,6 +28,13 @@ public sealed class CachedRepository<T> : IRepository<T>
             entry.SlidingExpiration = TimeSpan.FromDays(7);
             return await repository.GetByIdAsync(id);
         }))!;
+
+    public async ValueTask<T?> GetByIdWithIncludeAsync(string id, params Expression<Func<T, object>>[] includes) =>
+    (await memoryCache.GetOrCreateAsync(id, async entry =>
+    {
+        entry.SlidingExpiration = TimeSpan.FromDays(7);
+        return await repository.GetByIdWithIncludeAsync(id, includes);
+    }))!;
 
     public async ValueTask<IPagedList<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null,
         Expression<Func<T, object>>? orderBy = null,

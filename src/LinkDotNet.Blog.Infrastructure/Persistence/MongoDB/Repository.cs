@@ -109,4 +109,6 @@ public sealed class Repository<TEntity> : IRepository<TEntity>
             await Collection.InsertManyAsync(records);
         }
     }
+
+    public ValueTask<TEntity?> GetByIdWithIncludeAsync(string id, params Expression<Func<TEntity, object>>[] includes) => throw new NotImplementedException();
 }

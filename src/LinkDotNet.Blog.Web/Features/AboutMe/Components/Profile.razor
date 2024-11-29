@@ -65,7 +65,7 @@ OnYesPressed="DeleteItem"></ConfirmDialog>
 
     private async Task DeleteItem()
     {
-        var entryToDelete = ProfileInformation.ProfileInformationEntries.Single(p => p.Content == currentDeleteKey);
+        var entryToDelete = ProfileInformation.ProfileInformationEntries.FirstOrDefault(p => p.Content == currentDeleteKey);
         ProfileInformation.ProfileInformationEntries.Remove(entryToDelete);
         await Repository.DeleteAsync(entryToDelete.Id);
     }
@@ -73,7 +73,7 @@ OnYesPressed="DeleteItem"></ConfirmDialog>
     private async Task AddValue(string toAdd)
     {
         var sortOrder = GetSortOrder();
-        var newEntry = ProfileInformationEntry.Create(toAdd, sortOrder, ProfileInformation.ProfileInformationEntries.First().ProfileId);
+        var newEntry = ProfileInformationEntry.Create(toAdd, sortOrder, ProfileInformation.ProfileId);
 
         ProfileInformation.ProfileInformationEntries.Add(newEntry);
         await Repository.StoreAsync(newEntry);

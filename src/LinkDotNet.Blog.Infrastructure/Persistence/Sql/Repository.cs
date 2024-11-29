@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -40,6 +40,17 @@ public sealed partial class Repository<TEntity> : IRepository<TEntity>
     {
         await using var blogDbContext = await dbContextFactory.CreateDbContextAsync();
         return await blogDbContext.Set<TEntity>().FirstOrDefaultAsync(b => b.Id == id);
+    }
+
+    public async ValueTask<TEntity?> GetByIdWithIncludeAsync(string id, params Expression<Func<TEntity, object>>[] includes)
+    {
+        await using var blogDbContext = await dbContextFactory.CreateDbContextAsync();
+        IQueryable<TEntity> query = blogDbContext.Set<TEntity>();
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        return await query.FirstOrDefaultAsync(b => b.Id == id);
     }
 
     public ValueTask<IPagedList<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? filter = null,

@@ -40,18 +40,18 @@
     {
         var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
         isAuthenticated = userIdentity?.IsAuthenticated ?? false;
-        var profile = await ProfileRepository.GetByIdAsync(ProfileId.ToString()) ?? new PersonalProfile();
-
+        var profile = await ProfileRepository.GetByIdWithIncludeAsync(ProfileId.ToString(), p => p.ProfileInformationEntries) ?? new PersonalProfile();
         profileInformation = new ProfileInformation
-        {
-            Name = profile.FullName,
-            Heading = profile.Talk?.PresentationTitle ?? string.Empty,
+            {
+                ProfileId = profile.Id,
+                Name = profile.FullName,
+                Heading = profile.Talk?.PresentationTitle ?? string.Empty,
                 ProfilePictureUrl = ImageUrl ?? string.Empty,
-            FirstName = profile.FirstName,
-            LastName = profile.LastName,
-            FullName = profile.FullName,
-            ProfileInformationEntries = profile.ProfileInformationEntries.ToList()
-        };
+                FirstName = profile.FirstName,
+                LastName = profile.LastName,
+                FullName = profile.FullName,
+                ProfileInformationEntries = profile.ProfileInformationEntries.ToList()
+            };
     }
 
     private void GoBack()
