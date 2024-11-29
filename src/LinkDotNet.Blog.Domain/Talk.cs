@@ -27,4 +27,12 @@ public sealed class Talk : Entity
             ProfileId = profileId
         };
     }
+
+    public void Update(string presentationTitle, string place, string description, DateTime publishedDate)
+    {
+        PresentationTitle = presentationTitle;
+        Place = place;
+        Description = description;
+        PublishedDate = publishedDate;
+    }
 }

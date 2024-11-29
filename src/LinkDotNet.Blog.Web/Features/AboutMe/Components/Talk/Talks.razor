@@ -2,20 +2,21 @@
 @using LinkDotNet.Blog.Infrastructure.Persistence
 @inject IRepository<Talk> Repository
 
-@if (talks.Any() || ShowAdminActions)
+@if (talk != null || ShowAdminActions)
 {
     @if (ShowAdminActions)
     {
-        <button id="add-talk" type="button" class="btn btn-primary" @onclick="() => AddTalkEntryDialog.Open()">
-            <i class="plus"></i>Add talk</button>
-        <AddTalkEntryDialog @ref="AddTalkEntryDialog" TalkCreated="StoreTalk" ProfileId="@ProfileId"></AddTalkEntryDialog>
+        <button id="add-talk" type="button" class="btn btn-primary" @onclick="OpenAddOrEditTalkDialog">
+            <i class="plus"></i>@(talk != null ? "Edit Profile" : "Add Profile")
+        </button>
+        <AddTalkEntryDialog @ref="AddTalkEntryDialog" TalkCreated="StoreTalk" TalkToEdit="talk" ProfileId="@ProfileId"></AddTalkEntryDialog>
     }
-    <ul class="list-unstyled">
-        @foreach (var talk in talks)
-        {
-            <TalkEntry Talk="talk" ShowAdminActions="ShowAdminActions" TalkDeleted="@(() => DeleteTalk(talk))"></TalkEntry>
-        }
-    </ul>
+    @if (talk != null)
+    {
+        <ul class="list-unstyled">
+            <TalkEntry Talk="talk" ShowAdminActions="ShowAdminActions" TalkDeleted="@DeleteTalk"></TalkEntry>
+        </ul>
+    }
 }
 
 @code {
@@ -25,24 +26,31 @@
     [Parameter]
     public string ProfileId { get; set; } = string.Empty;
 
-    private List<Talk> talks = new();
-
+    private Talk? talk;
     private AddTalkEntryDialog AddTalkEntryDialog { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        talks = (await Repository.GetAllAsync(t => t.ProfileId == ProfileId, orderBy: t => t.PublishedDate, descending: true)).ToList();
+        talk = (await Repository.GetAllAsync(t => t.ProfileId == ProfileId)).FirstOrDefault();
     }
 
-    private async Task DeleteTalk(Talk talk)
+    private void OpenAddOrEditTalkDialog()
     {
-        talks.Remove(talk);
-        await Repository.DeleteAsync(talk.Id);
+        AddTalkEntryDialog.Open();
     }
 
-    private async Task StoreTalk(Talk talk)
+    private async Task DeleteTalk()
     {
-        talks.Add(talk);
+        if (talk != null)
+        {
+            await Repository.DeleteAsync(talk.Id);
+            talk = null;
+        }
+    }
+
+    private async Task StoreTalk(Talk updatedTalk)
+    {
+        talk = updatedTalk;
         await Repository.StoreAsync(talk);
     }
 }
