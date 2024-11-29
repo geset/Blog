@@ -18,12 +18,14 @@
         <div class="row">
             <div class="col-lg-3 col-md-4">
                 <Profile ShowAdminActions="@isAuthenticated" ProfileInformation="profileInformation" />
+                <button class="btn btn-secondary mt-3" @onclick="GoBack">Go Back to Profile search</button>
             </div>
             <TabbedNavigation IsAuthenticated="isAuthenticated" ProfileId="@ProfileId.ToString()" />
+            
         </div>
     </div>
 }
-<button @onclick="GoBack">Back</button>
+
 
 @code {
     private bool isAuthenticated;
