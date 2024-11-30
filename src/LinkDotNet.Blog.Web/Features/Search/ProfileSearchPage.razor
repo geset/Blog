@@ -2,6 +2,7 @@
 @using LinkDotNet.Blog.Domain
 @using LinkDotNet.Blog.Infrastructure.Persistence
 @using LinkDotNet.Blog.Web.Features.AboutMe.Components.ProfileInfo
+@using LinkDotNet.Blog.Web.Features.Components
 @using LinkDotNet.Blog.Web.Features.Services
 @inject NavigationManager NavigationManager
 @inject IRepository<PersonalProfile> ProfileRepository
@@ -13,7 +14,7 @@
             <input @bind="searchTerm" placeholder="Enter first or last name" class="form-control" />
             <button @onclick="Search" class="btn btn-primary mt-2">Search</button>
         </div>
-        <div class="col-lg-9 col-md-8">
+        <div class="col-lg-9 col-md-8 d-flex justify-content-between align-items-center">
             <button type="button" class="btn btn-primary" @onclick="OpenAddProfileDialog">
                 <i class="plus"></i>Add Profile
             </button>
@@ -28,9 +29,14 @@
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span @onclick="() => NavigateToProfile(result.Id)">@result.FullName</span>
-                            <button type="button" class="btn btn-primary" @onclick="() => OpenEditProfileDialog(result)">
-                                <i class="pencil"></i>
-                            </button>
+                            <div>
+                                <button type="button" class="btn btn-primary" @onclick="() => OpenEditProfileDialog(result)">
+                                    <i class="pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger" @onclick="() => ConfirmDeleteProfile(result)">
+                                    <i class="bin2"></i>
+                                </button>
+                            </div>
                         </li>
                     }
                 </ul>
@@ -40,12 +46,15 @@
 </div>
 
 <AddProfileDialog @ref="addProfileDialog" ProfileCreated="StoreProfile" />
+<ConfirmDialog @ref="confirmDialog" Title="Delete Profile" Content="Do you really want to delete this profile?" OnYesPressed="DeleteProfile" />
 
 @code {
     private string searchTerm;
     private List<PersonalProfile> searchResults;
     private AddProfileDialog addProfileDialog;
+    private ConfirmDialog confirmDialog;
     private PersonalProfile? profileToEdit;
+    private PersonalProfile? profileToDelete;
 
     private async Task Search()
     {
@@ -71,6 +80,22 @@
         profileToEdit = profile;
         addProfileDialog.ProfileToEdit = profileToEdit;
         addProfileDialog.Show();
+    }
+
+    private void ConfirmDeleteProfile(PersonalProfile profile)
+    {
+        profileToDelete = profile;
+        confirmDialog.Open();
+    }
+
+    private async Task DeleteProfile()
+    {
+        if (profileToDelete != null)
+        {
+            await ProfileRepository.DeleteAsync(profileToDelete.Id);
+            searchResults.Remove(profileToDelete);
+            profileToDelete = null;
+        }
     }
 
     private async Task StoreProfile(PersonalProfile profile)
