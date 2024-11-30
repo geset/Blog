@@ -1,7 +1,7 @@
 @using LinkDotNet.Blog.Domain
 
 <ModalDialog @ref="Dialog" Title="@((ProfileToEdit != null) ? "Edit Profile" : "Add Profile")">
-    <EditForm Model="model" OnValidSubmit="CreateOrUpdateProfile">
+    <EditForm Model="model" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -22,31 +22,37 @@
     [Parameter]
     public EventCallback<PersonalProfile> ProfileCreated { get; set; }
 
-    [Parameter]
-    public PersonalProfile? ProfileToEdit { get; set; }
-
     private ModalDialog Dialog { get; set; } = default!;
     private AddProfileViewModel model = new();
 
+    private PersonalProfile? _profileToEdit;
+    [Parameter]
+    public PersonalProfile? ProfileToEdit
+    {
+        get => _profileToEdit;
+        set
+        {
+            if (_profileToEdit != value)
+            {
+                _profileToEdit = value;
+                model = _profileToEdit != null
+                    ? new AddProfileViewModel
+                    {
+                        FirstName = _profileToEdit.FirstName,
+                        LastName = _profileToEdit.LastName
+                    }
+                    : new AddProfileViewModel();
+            }
+        }
+    }
+
     public void Show()
     {
-        if (ProfileToEdit != null)
-        {
-            model = new AddProfileViewModel
-            {
-                FirstName = ProfileToEdit.FirstName,
-                LastName = ProfileToEdit.LastName
-            };
-        }
-        else
-        {
-            model = new AddProfileViewModel();
-        }
         Dialog.Open();
         StateHasChanged();
     }
 
-    private async Task CreateOrUpdateProfile()
+    private async Task HandleSubmit()
     {
         ArgumentNullException.ThrowIfNull(model.FirstName);
         ArgumentNullException.ThrowIfNull(model.LastName);

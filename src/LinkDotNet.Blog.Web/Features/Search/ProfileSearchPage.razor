@@ -26,8 +26,11 @@
                 <ul class="list-group mt-3">
                     @foreach (var result in searchResults)
                     {
-                        <li class="list-group-item">
-                            <a @onclick="() => NavigateToProfile(result.Id)">@result.FullName</a>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span @onclick="() => NavigateToProfile(result.Id)">@result.FullName</span>
+                            <button type="button" class="btn btn-primary" @onclick="() => OpenEditProfileDialog(result)">
+                                <i class="pencil"></i>
+                            </button>
                         </li>
                     }
                 </ul>
@@ -42,6 +45,7 @@
     private string searchTerm;
     private List<PersonalProfile> searchResults;
     private AddProfileDialog addProfileDialog;
+    private PersonalProfile? profileToEdit;
 
     private async Task Search()
     {
@@ -57,12 +61,20 @@
 
     private void OpenAddProfileDialog()
     {
+        profileToEdit = null;
+        addProfileDialog.ProfileToEdit = profileToEdit;
+        addProfileDialog.Show();
+    }
+
+    private void OpenEditProfileDialog(PersonalProfile profile)
+    {
+        profileToEdit = profile;
+        addProfileDialog.ProfileToEdit = profileToEdit;
         addProfileDialog.Show();
     }
 
     private async Task StoreProfile(PersonalProfile profile)
     {
-        searchTerm = profile.FirstName;
         await ProfileRepository.StoreAsync(profile);
         await Search();
     }
