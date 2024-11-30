@@ -21,11 +21,9 @@
                 <button class="btn btn-secondary mt-3" @onclick="GoBack">Go Back to Profile search</button>
             </div>
             <TabbedNavigation IsAuthenticated="isAuthenticated" ProfileId="@ProfileId.ToString()" />
-            
         </div>
     </div>
 }
-
 
 @code {
     private bool isAuthenticated;
@@ -36,24 +34,27 @@
     ? profileInformation.ProfilePictureUrl.ToAbsoluteUrl(NavigationManager.BaseUri)
     : "assets/profile-picture.webp";
 
-    //private string ImageUrl => profileInformation?.ProfilePictureUrl.ToAbsoluteUrl(NavigationManager.BaseUri);
-
     protected override async Task OnInitializedAsync()
     {
         var userIdentity = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
         isAuthenticated = userIdentity?.IsAuthenticated ?? false;
-        var profile = await ProfileRepository.GetByIdWithIncludeAsync(ProfileId.ToString(), p => p.ProfileInformationEntries) ?? new PersonalProfile();
+        var profile = await ProfileRepository.GetByIdWithIncludeAsync(ProfileId.ToString(), p => p.ProfileInformationEntries);
+        if (profile == null)
+        {
+            NavigationManager.NavigateTo("/profile-information-search");
+            return;
+        }
         profileInformation = new ProfileInformation
-            {
-                ProfileId = profile.Id,
-                Name = profile.FullName,
-                Heading = profile.Talk?.PresentationTitle ?? string.Empty,
-                ProfilePictureUrl = ImageUrl ?? string.Empty,
-                FirstName = profile.FirstName,
-                LastName = profile.LastName,
-                FullName = profile.FullName,
-                ProfileInformationEntries = profile.ProfileInformationEntries.ToList()
-            };
+        {
+            ProfileId = profile.Id,
+            Name = profile.FullName,
+            Heading = profile.Talk?.PresentationTitle ?? string.Empty,
+            ProfilePictureUrl = ImageUrl ?? string.Empty,
+            FirstName = profile.FirstName,
+            LastName = profile.LastName,
+            FullName = profile.FullName,
+            ProfileInformationEntries = profile.ProfileInformationEntries.ToList()
+        };
     }
 
     private void GoBack()

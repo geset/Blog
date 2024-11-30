@@ -1,0 +1,76 @@
+@using LinkDotNet.Blog.Domain
+
+<ModalDialog @ref="Dialog" Title="@((ProfileToEdit != null) ? "Edit Profile" : "Add Profile")">
+    <EditForm Model="model" OnValidSubmit="CreateOrUpdateProfile">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <InputText id="firstName" @bind-Value="model.FirstName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <InputText id="lastName" @bind-Value="model.LastName" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+    </EditForm>
+</ModalDialog>
+
+@code {
+    [Parameter]
+    public EventCallback<PersonalProfile> ProfileCreated { get; set; }
+
+    [Parameter]
+    public PersonalProfile? ProfileToEdit { get; set; }
+
+    private ModalDialog Dialog { get; set; } = default!;
+    private AddProfileViewModel model = new();
+
+    public void Show()
+    {
+        if (ProfileToEdit != null)
+        {
+            model = new AddProfileViewModel
+            {
+                FirstName = ProfileToEdit.FirstName,
+                LastName = ProfileToEdit.LastName
+            };
+        }
+        else
+        {
+            model = new AddProfileViewModel();
+        }
+        Dialog.Open();
+        StateHasChanged();
+    }
+
+    private async Task CreateOrUpdateProfile()
+    {
+        ArgumentNullException.ThrowIfNull(model.FirstName);
+        ArgumentNullException.ThrowIfNull(model.LastName);
+
+        PersonalProfile profile;
+        if (ProfileToEdit != null)
+        {
+            // Update existing profile
+            ProfileToEdit.Update(model.FirstName, model.LastName);
+            profile = ProfileToEdit;
+        }
+        else
+        {
+            // Create new profile
+            profile = PersonalProfile.Create(model.FirstName, model.LastName);
+        }
+
+        await ProfileCreated.InvokeAsync(profile);
+        model = new AddProfileViewModel();
+        Dialog.Close();
+    }
+
+    private void Cancel()
+    {
+        Dialog.Close();
+    }
+}
