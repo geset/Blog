@@ -18,7 +18,7 @@
         <div class="row">
             <div class="col-lg-3 col-md-4">
                 <Profile ShowAdminActions="@isAuthenticated" ProfileInformation="profileInformation" />
-                <button class="btn btn-secondary mt-3" @onclick="GoBack">Go Back to Profile search</button>
+                <button class="btn btn-secondary mt-3" @onclick="GoBack">Go Back to Profiles</button>
             </div>
             <TabbedNavigation IsAuthenticated="isAuthenticated" ProfileId="@ProfileId.ToString()" />
         </div>
@@ -41,7 +41,7 @@
         var profile = await ProfileRepository.GetByIdWithIncludeAsync(ProfileId.ToString(), p => p.ProfileInformationEntries);
         if (profile == null)
         {
-            NavigationManager.NavigateTo("/profile-information-search");
+            NavigationManager.NavigateTo("/profile-information");
             return;
         }
         profileInformation = new ProfileInformation
@@ -59,6 +59,6 @@
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/profile-information-search");
+        NavigationManager.NavigateTo("/profile-information");
     }
 }

@@ -1,4 +1,4 @@
-@page "/profile-information-search"
+@page "/profile-information"
 @using LinkDotNet.Blog.Domain
 @using LinkDotNet.Blog.Infrastructure.Persistence
 @using LinkDotNet.Blog.Web.Features.AboutMe.Components.ProfileInfo
@@ -9,19 +9,21 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-3 col-md-4">
-            <h3>Search Profiles</h3>
-            <input @bind="searchTerm" placeholder="Enter first or last name" class="form-control" />
-            <button @onclick="Search" class="btn btn-primary mt-2">Search</button>
-        </div>
-        <div class="col-lg-9 col-md-8 d-flex justify-content-between align-items-center">
-            <button type="button" class="btn btn-primary" @onclick="OpenAddProfileDialog">
-                <i class="plus"></i>Add Profile
-            </button>
+        <h3 class="text-center my-4">Profiles</h3>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-3 d-flex my-2">
+                <button type="button" class="btn btn-primary w-100" @onclick="OpenAddProfileDialog">
+                    <i class="plus"></i> Add Profile
+                </button>
+            </div>
+            <div class="col-12 col-md-6 d-flex">
+                <input @bind="searchTerm" @bind:event="oninput" placeholder="Enter first or last name" class="form-control me-2" />
+                <button @onclick="Search" class="btn btn-primary" disabled="@IsSearchDisabled"><i class="search"></i> Search</button>
+            </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-9 col-md-8">
+        <div class="col-lg-12 col-md-12">
             @if (searchResults != null)
             {
                 <ul class="list-group mt-3">
@@ -30,11 +32,13 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span @onclick="() => NavigateToProfile(result.Id)">@result.FullName</span>
                             <div>
-                                <button type="button" class="btn btn-primary" @onclick="() => OpenEditProfileDialog(result)">
+                                <button id="edit-profile" type="button" class="btn btn-primary align-items-center gap-2" @onclick="() => OpenEditProfileDialog(result)" aria-label="edit profile">
                                     <i class="pencil"></i>
+                                    <div class="vr"></div><span>Edit</span>
                                 </button>
-                                <button type="button" class="btn btn-danger" @onclick="() => ConfirmDeleteProfile(result)">
+                                <button id="delete-profile" type="button" class="btn btn-danger align-items-center gap-2" @onclick="() => ConfirmDeleteProfile(result)" aria-label="delete profile">
                                     <i class="bin2"></i>
+                                    <div class="vr"></div><span>Delete</span>
                                 </button>
                             </div>
                         </li>
@@ -49,18 +53,23 @@
 <ConfirmDialog @ref="confirmDialog" Title="Delete Profile" Content="Do you really want to delete this profile?" OnYesPressed="DeleteProfile" />
 
 @code {
-    private string searchTerm;
+    private string searchTerm = string.Empty;
     private List<PersonalProfile> searchResults;
     private AddProfileDialog addProfileDialog;
     private ConfirmDialog confirmDialog;
     private PersonalProfile? profileToEdit;
     private PersonalProfile? profileToDelete;
 
+    private bool IsSearchDisabled => searchTerm.Length < 3;
+
     private async Task Search()
     {
-        searchResults = (await ProfileRepository.GetAllAsync())
-            .Where(p => p.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || p.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            searchResults = (await ProfileRepository.GetAllAsync())
+                .Where(p => p.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || p.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
     }
 
     private void NavigateToProfile(string profileId)
