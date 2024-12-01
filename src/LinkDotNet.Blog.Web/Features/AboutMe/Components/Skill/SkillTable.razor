@@ -1,6 +1,8 @@
 @using LinkDotNet.Blog.Domain
 @using LinkDotNet.Blog.Infrastructure.Persistence
+@using LinkDotNet.Blog.Web.Features.AboutMe.Components.Skill
 @inject IRepository<Skill> Repository
+
 <div>
     @if (ShowAdminActions)
     {
@@ -11,49 +13,50 @@
 </div>
 <div class="table-container">
     <table class="skill-table" id="skill-table">
-        <tbody>
-        <tr>
-            <th>Capability</th>
-            <th>Familiar with</th>
-            <th>Proficient</th>
-            <th>Expert</th>
-        </tr>
-        @foreach (var skillCapabilityGroup in skills.GroupBy(s => s.Capability))
-        {
-            <tr ondragover="event.preventDefault();">
-                <td>@skillCapabilityGroup.Key</td>
-                @foreach (var skillLevel in ProficiencyLevel.All)
+        <thead>
+            <tr>
+                <th></th>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Venue/Publisher</th>
+                @if (ShowAdminActions)
                 {
-                    <td @ondrop="@(() => HandleDrop(skillLevel))" class="proficiency-level">
-                        @foreach (var skill in skillCapabilityGroup.Where(s => s.ProficiencyLevel == skillLevel))
-                        {
-                            @if (ShowAdminActions)
-                            {
-                                <div draggable="true" @ondrag="@(() => currentDragItem = skill)" style="cursor: grab"
-                                 class="skill-tag">
-                                    <SkillTag Skill="@skill"
-                                              ShowAdminActions="@true"
-                                              DeleteSkill="@(() => DeleteSkill(skill))"/>
-                                </div>
-                            }
-                            else
-                            {
-                                <div>
-                                    <SkillTag Skill="@skill"/>
-                                </div>
-                            }
-                        }
-                    </td>
+                    <th>Actions</th>
                 }
             </tr>
-        }
+        </thead>
+        <tbody>
+            @foreach (var skill in skills)
+            {
+                <tr @onclick="() => ToggleDescription(skill.Id)">
+                    <td class="expand-icon">
+                        @(expandedSkillId == skill.Id ? "▼" : "▶")
+                    </td>
+                    <td>@skill.Type</td>
+                    <td>@skill.Title</td>
+                    <td>@skill.Date.ToShortDateString()</td>
+                    <td>@skill.VenueOrPublisher</td>
+                    @if (ShowAdminActions)
+                    {
+                        <td>
+                            <button type="button" class="btn btn-default" aria-label="Delete Item" @onclick:stopPropagation @onclick="() => DeleteSkill(skill)">
+                                <i class="bin2" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    }
+                </tr>
+                @if (expandedSkillId == skill.Id)
+                {
+                    <tr class="description-row">
+                        <td colspan="6">@skill.Description</td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
-    @if (ShowAdminActions)
-    {
-        <small for="skill-table">You can drag and drop your skills from one proficiency to another</small>
-    }
 </div>
+
 @code {
     [Parameter]
     public bool ShowAdminActions { get; set; }
@@ -64,8 +67,7 @@
     private AddSkillDialog AddSkillDialog { get; set; } = default!;
 
     private List<Skill> skills = new();
-
-    private Skill? currentDragItem;
+    private string? expandedSkillId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,15 +88,49 @@
         await Repository.DeleteAsync(skill.Id);
     }
 
-    private async Task HandleDrop(ProficiencyLevel proficiencyLevel)
+    private void ToggleDescription(string skillId)
     {
-        if (currentDragItem is null || currentDragItem.ProficiencyLevel == proficiencyLevel)
+        if (expandedSkillId == skillId)
         {
-            return;
+            expandedSkillId = null;
         }
-
-        currentDragItem.SetProficiencyLevel(proficiencyLevel);
-        await Repository.StoreAsync(currentDragItem);
-        currentDragItem = null;
+        else
+        {
+            expandedSkillId = skillId;
+        }
     }
 }
+
+<style>
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .skill-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .skill-table th, .skill-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .expand-icon {
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .description-row td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        background-color: inherit;
+        color: inherit;
+        white-space: pre-wrap; /* Allows word wrapping */
+    }
+
+    .btn {
+        margin-top: 8px;
+    }
+</style>

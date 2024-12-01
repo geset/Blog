@@ -4,42 +4,48 @@ namespace LinkDotNet.Blog.Domain;
 
 public sealed class Skill : Entity
 {
-    private Skill(string name, string? iconUrl, string capability, ProficiencyLevel proficiencyLevel)
+    private Skill(string type, string title, DateTime date, string venueOrPublisher, string description)
     {
-        IconUrl = iconUrl;
-        Name = name;
-        Capability = capability;
-        ProficiencyLevel = proficiencyLevel;
+        Type = type;
+        Title = title;
+        Date = date;
+        VenueOrPublisher = venueOrPublisher;
+        Description = description;
     }
 
-    public string? IconUrl { get; private set; }
+    public string Type { get; private set; }
+    public string Title { get; private set; }
+    public DateTime Date { get; private set; }
+    public string VenueOrPublisher { get; private set; }
+    public string Description { get; private set; }
+    public string ProfileId { get; private set; }
+    public PersonalProfile Profile { get; private set; }
 
-    public string Name { get; private set; }
-
-    public string Capability { get; private set; }
-
-    public ProficiencyLevel ProficiencyLevel { get; private set; }
-    public string ProfileId { get; set; }
-    public PersonalProfile Profile { get; set; }
-
-    public static Skill Create(string name, string? iconUrl, string capability, string proficiencyLevel, string profileId)
+    public static Skill Create(string type, string title, DateTime date, string venueOrPublisher, string description, string profileId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentException.ThrowIfNullOrWhiteSpace(capability);
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(venueOrPublisher);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
         ArgumentException.ThrowIfNullOrWhiteSpace(profileId);
 
-        var level = ProficiencyLevel.Create(proficiencyLevel);
-
-        iconUrl = string.IsNullOrWhiteSpace(iconUrl) ? null : iconUrl;
-        return new Skill(name.Trim(), iconUrl, capability.Trim(), level)
+        return new Skill(type.Trim(), title.Trim(), date, venueOrPublisher.Trim(), description.Trim())
         {
             ProfileId = profileId
         };
     }
 
-    public void SetProficiencyLevel(ProficiencyLevel level)
+    public void Update(string type, string title, DateTime date, string venueOrPublisher, string description)
     {
-        ArgumentNullException.ThrowIfNull(level);
-        ProficiencyLevel = level;
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(venueOrPublisher);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+
+        Type = type.Trim();
+        Title = title.Trim();
+        Date = date;
+        VenueOrPublisher = venueOrPublisher.Trim();
+        Description = description.Trim();
     }
 }

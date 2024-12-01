@@ -1,33 +1,40 @@
 @using LinkDotNet.Blog.Domain
+@using LinkDotNet.Blog.Web.Features.AboutMe.Components.Skill
 @inject IToastService ToastService
+
 <ModalDialog @ref="Dialog" Title="Add Skill">
-    <EditForm Model="@model" OnValidSubmit="CreateSkillItem">
+    <EditForm Model="model" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
+
         <div class="mb-3">
-            <label for="title">Skill name</label>
-            <InputText class="form-control" id="title" @bind-Value="model.Skill" />
-        </div>
-        <div class="mb-3">
-            <label for="image">Image Url</label>
-            <InputText class="form-control" id="image" @bind-Value="model.ImageUrl"/>
-            <small for="image" class="form-text text-body-secondary">If set is used before the skill (optional). 24x24 pixel
-            optimal size</small>
-        </div>
-        <div class="mb-3">
-            <label for="capability">Capability</label>
-            <InputText class="form-control" id="capability" @bind-Value="model.Capability" />
-        </div>
-        <div class="mb-3">
-            <label for="proficiency">Proficiency</label>
-            <select class="form-select" id="proficiency" @bind="model.Proficiency">
-                @foreach (var level in ProficiencyLevel.All)
+            <label for="type" class="form-label">Type</label>
+            <InputSelect id="type" @bind-Value="model.Type" class="form-control">
+                <option value="">Select Type</option>
+                @foreach (var type in skillTypes)
                 {
-                    <option value="@level.Key">@level.Key</option>
+                    <option value="@type">@type</option>
                 }
-            </select>
+            </InputSelect>
         </div>
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <InputText id="title" @bind-Value="model.Title" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <InputDate id="date" @bind-Value="model.Date" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="venueOrPublisher" class="form-label">Venue/Publisher</label>
+            <InputText id="venueOrPublisher" @bind-Value="model.VenueOrPublisher" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <InputTextArea id="description" @bind-Value="model.Description" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
     </EditForm>
 </ModalDialog>
 
@@ -36,25 +43,28 @@
     public EventCallback<Skill> SkillAdded { get; set; }
 
     [Parameter]
-    public string ProfileId { get; set; } = default!;
+    public string ProfileId { get; set; } = string.Empty;
 
-    private AddSkillModel model = new();
     private ModalDialog Dialog { get; set; } = default!;
+    private AddSkillModel model = new();
+    private readonly List<string> skillTypes = new() { "Book", "Interview", "Lecture", "Research", "Talk" };
 
     public void Open()
     {
+        model = new AddSkillModel();
         Dialog.Open();
-        StateHasChanged();
     }
 
-    private async Task CreateSkillItem()
+    private async Task HandleSubmit()
     {
-        ArgumentNullException.ThrowIfNull(model.Skill);
-        ArgumentNullException.ThrowIfNull(model.Capability);
-
-        var skill = Skill.Create(model.Skill, model.ImageUrl, model.Capability, model.Proficiency, ProfileId);
+        var skill = Skill.Create(model.Type, model.Title, model.Date, model.VenueOrPublisher, model.Description, ProfileId);
         await SkillAdded.InvokeAsync(skill);
-        model = new AddSkillModel();
-        ToastService.ShowSuccess($"Created Skill {skill.Name} in capability {skill.Capability} with level {skill.ProficiencyLevel}");
+        ToastService.ShowSuccess($"Created Skill {skill.Title} of type {skill.Type}");
+        Dialog.Close();
+    }
+
+    private void Cancel()
+    {
+        Dialog.Close();
     }
 }

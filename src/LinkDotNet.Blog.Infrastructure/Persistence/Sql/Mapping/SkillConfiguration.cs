@@ -12,13 +12,25 @@ internal sealed class SkillConfiguration : IEntityTypeConfiguration<Skill>
         builder.Property(s => s.Id)
             .IsUnicode(false)
             .ValueGeneratedOnAdd();
-        builder.Property(s => s.ProficiencyLevel)
-            .HasConversion(to => to.Key, from => ProficiencyLevel.Create(from))
-            .HasMaxLength(32)
+
+        builder.Property(s => s.Type)
+            .HasMaxLength(128)
             .IsRequired();
-        builder.Property(s => s.Name).HasMaxLength(128).IsRequired();
-        builder.Property(s => s.IconUrl).HasMaxLength(1024);
-        builder.Property(s => s.Capability).HasMaxLength(128).IsRequired();
+
+        builder.Property(s => s.Title)
+            .HasMaxLength(128)
+            .IsRequired();
+
+        builder.Property(s => s.Date)
+            .IsRequired();
+
+        builder.Property(s => s.VenueOrPublisher)
+            .HasMaxLength(256)
+            .IsRequired();
+
+        builder.Property(s => s.Description)
+            .HasMaxLength(1024)
+            .IsRequired();
 
         builder.HasOne(e => e.Profile)
               .WithMany(p => p.Skills)

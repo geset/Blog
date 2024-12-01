@@ -1,47 +1,55 @@
 using LinkDotNet.Blog.Domain;
+using System;
 
 namespace LinkDotNet.Blog.TestUtilities;
 
 public class SkillBuilder
 {
-    private string skill = "C#";
-    private string? iconUrl;
-    private string capability = "Backend";
-    private ProficiencyLevel proficiencyLevel = ProficiencyLevel.Familiar;
-    private string ProfileId = "defaultProfileIdId"; // Default value for testing
+    private string type = "Lecture";
+    private string title = "C# Basics";
+    private DateTime date = DateTime.Now;
+    private string venueOrPublisher = "Online";
+    private string description = "Introduction to C#";
+    private string profileId = "defaultProfileId"; // Default value for testing
 
-    public SkillBuilder WithSkillName(string skill)
+    public SkillBuilder WithType(string type)
     {
-        this.skill = skill;
+        this.type = type;
         return this;
     }
 
-    public SkillBuilder WithIconUrl(string? iconUrl)
+    public SkillBuilder WithTitle(string title)
     {
-        this.iconUrl = iconUrl;
+        this.title = title;
         return this;
     }
 
-    public SkillBuilder WithCapability(string capability)
+    public SkillBuilder WithDate(DateTime date)
     {
-        this.capability = capability;
+        this.date = date;
         return this;
     }
 
-    public SkillBuilder WithProficiencyLevel(ProficiencyLevel proficiencyLevel)
+    public SkillBuilder WithVenueOrPublisher(string venueOrPublisher)
     {
-        this.proficiencyLevel = proficiencyLevel;
+        this.venueOrPublisher = venueOrPublisher;
         return this;
     }
 
-    public SkillBuilder WithProfileId(string ProfileId)
+    public SkillBuilder WithDescription(string description)
     {
-        this.ProfileId = ProfileId;
+        this.description = description;
+        return this;
+    }
+
+    public SkillBuilder WithProfileId(string profileId)
+    {
+        this.profileId = profileId;
         return this;
     }
 
     public Skill Build()
     {
-        return Skill.Create(skill, iconUrl, capability, proficiencyLevel.Key, ProfileId);
+        return Skill.Create(type, title, date, venueOrPublisher, description, profileId);
     }
 }

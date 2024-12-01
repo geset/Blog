@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System;
+using System.ComponentModel.DataAnnotations;
 using LinkDotNet.Blog.Domain;
 
 namespace LinkDotNet.Blog.Web.Features.AboutMe.Components.Skill;
@@ -6,13 +7,17 @@ namespace LinkDotNet.Blog.Web.Features.AboutMe.Components.Skill;
 public sealed class AddSkillModel
 {
     [Required]
-    public string? Skill { get; set; }
-
-    public string? ImageUrl { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     [Required]
-    public string Proficiency { get; set; } = ProficiencyLevel.Familiar.Key;
+    public string Title { get; set; } = string.Empty;
 
     [Required]
-    public string? Capability { get; set; }
+    public DateTime Date { get; set; }
+
+    [Required]
+    public string VenueOrPublisher { get; set; } = string.Empty;
+
+    [Required]
+    public string Description { get; set; } = string.Empty;
 }

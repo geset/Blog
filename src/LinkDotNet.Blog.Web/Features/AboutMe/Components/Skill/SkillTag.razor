@@ -1,10 +1,6 @@
-﻿@using LinkDotNet.Blog.Domain
+@using LinkDotNet.Blog.Domain
 <span class="skill-tag">
-    @if (!string.IsNullOrEmpty(Skill.IconUrl))
-    {
-        <img src="@Skill.IconUrl" alt="icon" max-width="48px"/>
-    }
-    @Skill.Name
+    @Skill.Title
 
     @if (ShowAdminActions)
     {
