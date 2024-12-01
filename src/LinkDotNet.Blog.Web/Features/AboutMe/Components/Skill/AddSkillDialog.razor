@@ -55,7 +55,10 @@
 
     public void Open()
     {
-        model = new AddSkillModel();
+        model = new AddSkillModel
+        {
+            Date = DateTime.Today 
+        };
         Dialog.Open();
     }
 
