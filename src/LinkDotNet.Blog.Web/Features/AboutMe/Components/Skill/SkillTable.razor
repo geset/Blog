@@ -7,7 +7,8 @@
     @if (ShowAdminActions)
     {
         <button type="button" class="btn btn-primary" @onclick="() => AddSkillDialog.Open()">
-            <i class="plus"></i>Add skill</button>
+            <i class="plus"><div class="vr"></div></i>Add skill
+        </button>
         <AddSkillDialog @ref="AddSkillDialog" SkillAdded="@AddSkill" ProfileId="@ProfileId" />
     }
 </div>
@@ -15,9 +16,9 @@
     <table class="skill-table" id="skill-table">
         <thead>
             <tr>
-                <th></th>
+                <th class="expand-column"></th>
+                <th class="title-column">Title</th>
                 <th>Type</th>
-                <th>Title</th>
                 <th>Date</th>
                 <th>Venue/Publisher</th>
                 @if (ShowAdminActions)
@@ -33,8 +34,17 @@
                     <td class="expand-icon">
                         @(expandedSkillId == skill.Id ? "▼" : "▶")
                     </td>
+                    <td class="title-column">
+                        @if (!string.IsNullOrEmpty(skill.Url))
+                        {
+                            <a href="@skill.Url" target="_blank">@skill.Title</a>
+                        }
+                        else
+                        {
+                            @skill.Title
+                        }
+                    </td>
                     <td>@skill.Type</td>
-                    <td>@skill.Title</td>
                     <td>@skill.Date.ToShortDateString()</td>
                     <td>@skill.VenueOrPublisher</td>
                     @if (ShowAdminActions)
@@ -109,6 +119,7 @@
     .skill-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed; /* Ensures the table layout is fixed */
     }
 
     .skill-table th, .skill-table td {
@@ -117,9 +128,24 @@
         border-bottom: 1px solid #ddd;
     }
 
+    .expand-column {
+        width: 30px; /* Fixed width for expand icon column */
+    }
+
     .expand-icon {
         cursor: pointer;
         text-align: center;
+    }
+
+    .title-column {
+        width: 40%; /* Double the size of other columns */
+    }
+
+    .skill-table th:nth-child(3), .skill-table td:nth-child(3),
+    .skill-table th:nth-child(4), .skill-table td:nth-child(4),
+    .skill-table th:nth-child(5), .skill-table td:nth-child(5),
+    .skill-table th:nth-child(6), .skill-table td:nth-child(6) {
+        width: 15%; /* Fixed width for other columns */
     }
 
     .description-row td {

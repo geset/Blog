@@ -30,6 +30,10 @@
             <InputText id="venueOrPublisher" @bind-Value="model.VenueOrPublisher" class="form-control" />
         </div>
         <div class="mb-3">
+            <label for="url" class="form-label">URL</label>
+            <InputText id="url" @bind-Value="model.Url" class="form-control" />
+        </div>
+        <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <InputTextArea id="description" @bind-Value="model.Description" class="form-control" />
         </div>
@@ -57,7 +61,7 @@
 
     private async Task HandleSubmit()
     {
-        var skill = Skill.Create(model.Type, model.Title, model.Date, model.VenueOrPublisher, model.Description, ProfileId);
+        var skill = Skill.Create(model.Type, model.Title, model.Date, model.VenueOrPublisher, model.Description, ProfileId, model.Url);
         await SkillAdded.InvokeAsync(skill);
         ToastService.ShowSuccess($"Created Skill {skill.Title} of type {skill.Type}");
         Dialog.Close();
